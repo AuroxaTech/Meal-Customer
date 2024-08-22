@@ -1,0 +1,7 @@
+flutter_application_id:
+  android:
+    id: "online.mealknight"
+    name: "Glover"
+  ios:
+    id: "online.mealknight"
+    name: "Glover"

@@ -2,7 +2,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:mealknight/widgets/base.page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:velocity_x/velocity_x.dart';
 import '../../../constants/app_colors.dart';
 import '../../../models/ticket_list_model.dart';
 import '../../../requests/order.request.dart';
@@ -145,18 +147,15 @@ class _CustomerChatSupportState extends State<CustomerChatSupport> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          "Messages",
-          style: TextStyle(
-            fontSize: 25,
-            fontWeight: FontWeight.bold,
-            color: AppColor.primaryColor,
-          ),
-        ),
-        centerTitle: true,
-      ),
+    return BasePage(
+      showAppBar: true,
+      title: 'Messages',
+      showLeadingAction: true,
+      elevation: 0,
+      centerTitle: true,
+      appBarColor: context.theme.colorScheme.background,
+      appBarItemColor: AppColor.primaryColor,
+      backgroundColor: const Color(0xffeefffd),
       body: Column(
         children: [
           Expanded(
@@ -290,7 +289,7 @@ class _CustomerChatSupportState extends State<CustomerChatSupport> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                    _selectedImage == null ?SizedBox() :    Padding(
+                    _selectedImage == null ?const SizedBox() :    Padding(
                       padding: const EdgeInsets.only(left: 10),
                       child: Container(
                             height: 80,
@@ -334,7 +333,6 @@ class _CustomerChatSupportState extends State<CustomerChatSupport> {
                 ],
               ),
             ),
-
         ],
       ),
     );

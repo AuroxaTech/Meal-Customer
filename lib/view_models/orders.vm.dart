@@ -161,36 +161,34 @@ class OrdersViewModel extends PaymentViewModel {
     super.dispose();
   }
 
-    fetchMyOrders({bool initialLoading = true}) async {
-      if (initialLoading==true) {
-        setBusy(true);
-        refreshController.refreshCompleted();
-        queryPage = 1;
-      }
-      else {
-        queryPage++;
-      }
-      try {
-        print("Query Page ====> $queryPage");
-        final mOrders = await orderRequest.getOrders(page: queryPage);
-        if (initialLoading==false) {
-          orders.addAll(mOrders);
-          refreshController.loadComplete();
-
-        } else {
-          orders = mOrders;
-        }
-        clearErrors();
-      } catch (error) {
-        print("Order Error ==> $error");
-        setError(error);
-        rethrow;
-      }
-      setBusy(false);
-      notifyListeners();
-
-       // Notify listeners to update the UI
+  fetchMyOrders({bool initialLoading = true}) async {
+    if (initialLoading) {
+      setBusy(true);  // Set busy before starting the refresh
+      refreshController.refreshCompleted();
+      queryPage = 1;
+      //orders.clear();
+    } else {
+      queryPage++;
     }
+
+    try {
+      final mOrders = await orderRequest.getOrders(page: queryPage);
+      if (!initialLoading) {
+        orders.addAll(mOrders);
+        refreshController.loadComplete();
+      } else {
+        orders = mOrders;
+      }
+      clearErrors();
+    } catch (error) {
+      setError(error);
+      refreshController.loadFailed();
+    } finally {
+      setBusy(false);  // Make sure to set busy to false after fetching
+      rebuildUi();  // Notify listeners to rebuild the UI
+    }
+  }
+
 
   refreshDataSet() {
     initialise();

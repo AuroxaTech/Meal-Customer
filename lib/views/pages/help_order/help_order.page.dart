@@ -12,6 +12,7 @@ import '../../../widgets/base.page.dart';
 import '../../../widgets/custom_list_view.dart';
 import '../../../widgets/states/empty.state.dart';
 import '../../../widgets/states/error.state.dart';
+import '../../../widgets/states/loading.shimmer.dart';
 import '../../../widgets/states/order.empty.dart';
 import '../help_category/help_category.page.dart';
 
@@ -83,7 +84,7 @@ class _HelpOrderPageState extends State<HelpOrderPage>
                 return VStack(
                   [
                     vm.isAuthenticated()
-                        ? CustomListView(
+                        ? vm.isBusy? const LoadingShimmer(): CustomListView(
                             padding: const EdgeInsets.all(0),
                             canRefresh: true,
                             canPullUp: true,

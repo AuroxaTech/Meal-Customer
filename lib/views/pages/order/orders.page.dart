@@ -138,6 +138,8 @@ import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:stacked/stacked.dart';
 import 'package:velocity_x/velocity_x.dart';
 
+import '../../../widgets/states/loading.shimmer.dart';
+
 class OrdersPage extends StatefulWidget {
   const OrdersPage({super.key});
 
@@ -170,8 +172,10 @@ class _OrdersPageState extends State<OrdersPage>
     }
   }
 
+
   @override
   Widget build(BuildContext context) {
+    vm = OrdersViewModel(context);
     super.build(context);
     return BasePage(
       showAppBar: true,
@@ -187,25 +191,30 @@ class _OrdersPageState extends State<OrdersPage>
           viewModelBuilder: () => vm,
           onViewModelReady: (vm) => vm.initialise(),
           builder: (context, vm, child) {
-            return VStack(
+            return    VStack(
               [
                 vm.isAuthenticated()
-                    ? CustomListView(
+                    ?vm.isBusy?const LoadingShimmer():
+                CustomListView(
                   padding: const EdgeInsets.all(0),
                   canRefresh: true,
-                  canPullUp: false,
+                  canPullUp: true,
                   refreshController: vm.refreshController,
                   onRefresh: vm.fetchMyOrders,
-                  onLoading: () => vm.fetchMyOrders(initialLoading: false),
+                  onLoading: () =>
+                      vm.fetchMyOrders(initialLoading: false),
                   isLoading: vm.isBusy,
                   dataSet: vm.orders,
                   hasError: vm.hasError,
                   errorWidget: LoadingError(
                     onrefresh: vm.fetchMyOrders,
                   ),
+                  //
                   emptyWidget: const EmptyOrder(),
                   itemBuilder: (context, index) {
+                    //
                     final order = vm.orders[index];
+                    //for taxi type of order
                     if (order.taxiOrder != null) {
                       return TaxiOrderListItem(
                         order: order,
@@ -241,4 +250,3 @@ class _OrdersPageState extends State<OrdersPage>
   @override
   bool get wantKeepAlive => true;
 }
-

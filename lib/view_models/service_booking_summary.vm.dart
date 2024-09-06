@@ -16,7 +16,7 @@ import 'package:velocity_x/velocity_x.dart';
 
 class ServiceBookingSummaryViewModel extends CheckoutBaseViewModel {
   //
-  ServiceBookingSummaryViewModel(BuildContext context, this.service) {
+  ServiceBookingSummaryViewModel(BuildContext context, this.service)  {
     this.viewContext = context;
     vendor = service!.vendor;
     AppService().vendorId = vendor?.id;

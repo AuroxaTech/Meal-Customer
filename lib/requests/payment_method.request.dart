@@ -22,6 +22,8 @@ class PaymentMethodRequest extends HttpService {
 
     //
     final apiResponse = ApiResponse.fromResponse(apiResult);
+    print("payment methods ==> ${apiResponse.data}");
+
     if (apiResponse.allGood) {
       return (apiResponse.data.map((jsonObject) {
         return PaymentMethod.fromJson(jsonObject);

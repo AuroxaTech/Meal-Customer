@@ -22,7 +22,7 @@ class CheckoutViewModel extends CheckoutBaseViewModel {
   CheckoutViewModel(
     BuildContext context,
     CheckOut checkout,
-  ) {
+  )  {
     viewContext = context;
     this.checkout = checkout;
   }

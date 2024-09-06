@@ -35,6 +35,7 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
   List<VehicleType> vehicleTypes = [];
   VehicleType? selectedVehicleType;
 
+
 //get current on going trip
   void getOnGoingTrip() async {
     //

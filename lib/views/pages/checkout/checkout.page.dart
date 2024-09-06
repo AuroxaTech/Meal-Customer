@@ -46,6 +46,8 @@ class CheckoutPage extends StatelessWidget {
       viewModelBuilder: () => CheckoutViewModel(context, checkout),
       onViewModelReady: (vm) => vm.initialise(),
       builder: (context, vm, child) {
+        print("Min Prepare Time ===> ${vm.vendor?.minPrepareTime}");
+        print("Max Prepare Time ===> ${vm.vendor?.maxPrepareTime}");
         return BasePage(
           showAppBar: true,
           showLeadingAction: true,
@@ -170,7 +172,7 @@ class CheckoutPage extends StatelessWidget {
                     builder: (BuildContext context, Vendor? value, child) {
                       vm.checkout?.distance = value?.distance ?? 0.00;
                       vm.checkout?.travelTime = value?.travelTime ?? 0;
-
+                      print("Prepare Time ===> ${value?.prepareTime}");
                       return Row(
                         children: [
                           "${value?.prepareTime}"
@@ -385,7 +387,7 @@ class CheckoutPage extends StatelessWidget {
                     child: PaymentMethodsView(vm),
                   ),
 
-                  if (vm.selectedPaymentMethod?.name == "SquareUp") ...[
+                  if (vm.selectedPaymentMethod?.name == "Debit/Credit Card") ...[
                     if ((null != vm.paymentCard ||
                         null != vm.defaultCard.value))
                       PaymentCardView(

@@ -120,8 +120,9 @@ class Vendor {
   String toRawJson() => json.encode(toJson());
 
   factory Vendor.fromJson(Map<String, dynamic> json) {
+    print("Vendor Details ====> ${json.toString()}");
     Vendor vendor = Vendor(
-      id: json["id"],
+      id: json["id"]??0,
       vendorTypeId: json["vendor_type_id"],
       vendorType: VendorType.fromJson(json["vendor_type"]),
       name: json["name"],

@@ -20,7 +20,7 @@ import 'package:velocity_x/velocity_x.dart';
 
 class TaxiViewModel extends TripTaxiViewModel {
   //
-  TaxiViewModel(BuildContext context, this.vendorType) {
+  TaxiViewModel(BuildContext context, this.vendorType)  {
     this.viewContext = context;
   }
 

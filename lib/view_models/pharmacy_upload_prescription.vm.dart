@@ -15,7 +15,7 @@ import 'package:velocity_x/velocity_x.dart';
 
 class PharmacyUploadPrescriptionViewModel extends CheckoutBaseViewModel {
   //
-  PharmacyUploadPrescriptionViewModel(BuildContext context, this.vendor) {
+  PharmacyUploadPrescriptionViewModel(BuildContext context, this.vendor)  {
     this.viewContext = context;
     this.checkout = CheckOut(subTotal: 0.00);
     this.canSelectPaymentOption = true;

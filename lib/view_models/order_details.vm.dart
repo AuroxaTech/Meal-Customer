@@ -28,7 +28,7 @@ class OrderDetailsViewModel extends CheckoutBaseViewModel {
   OrderRequest orderRequest = OrderRequest();
   bool viewMap = false;
 
-  OrderDetailsViewModel(BuildContext context, this.order) {
+  OrderDetailsViewModel(BuildContext context, this.order)  {
     this.viewContext = context;
   }
 

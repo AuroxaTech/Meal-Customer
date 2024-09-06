@@ -677,6 +677,7 @@ import 'package:dartx/dartx.dart';
 import 'package:flutter/material.dart';
 import 'package:mealknight/constants/app_routes.dart';
 import 'package:mealknight/constants/app_strings.dart';
+import 'package:mealknight/extensions/dynamic.dart';
 import 'package:mealknight/extensions/string.dart';
 import 'package:mealknight/models/checkout.dart';
 import 'package:mealknight/models/delivery_address.dart';
@@ -698,9 +699,11 @@ import 'package:square_in_app_payments/models.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 import '../models/payment_card.dart';
+import '../models/vendor.dart';
 import 'vendor_distance.vm.dart';
 
 class CheckoutBaseViewModel extends PaymentViewModel {
+
   CheckoutRequest checkoutRequest = CheckoutRequest();
   DeliveryAddressRequest deliveryAddressRequest = DeliveryAddressRequest();
   PaymentMethodRequest paymentOptionRequest = PaymentMethodRequest();
@@ -808,9 +811,9 @@ class CheckoutBaseViewModel extends PaymentViewModel {
       await deliveryAddressRequest.preselectedDeliveryAddress(
         vendorId: vendor?.id,
       );
+      print("Vendor Id ===> ${vendor?.id}");
 
       if (checkout?.deliveryAddress != null) {
-        //
         checkDeliveryRange();
         updateTotalOrderSummary();
       }
@@ -867,6 +870,8 @@ class CheckoutBaseViewModel extends PaymentViewModel {
       onChangePaymentMethod(selectedPaymentMethod, callTotal: false);
     }
   }
+
+
 
   //
   Future<DeliveryAddress> showDeliveryAddressPicker() async {
@@ -930,7 +935,8 @@ class CheckoutBaseViewModel extends PaymentViewModel {
         vendor!.deliveryRange < (deliveryAddress!.distance ?? 0);
     if (deliveryAddress?.canDeliver != null) {
       delievryAddressOutOfRange = (deliveryAddress?.canDeliver ?? false) ==
-          false; //if vendor has set delivery range
+          false;//if vendor has set delivery range
+      print("Vendor deliveryRange ===> ${vendor!.deliveryRange}");
     }
     notifyListeners();
   }
@@ -1096,15 +1102,17 @@ class CheckoutBaseViewModel extends PaymentViewModel {
         text: "Please select a delivery address".tr(),
       );
       return; // Ensure it stops here
-    } else if (delievryAddressOutOfRange && !isPickup) {
-      //
+    }
+    else if (!isPickup && delievryAddressOutOfRange) {
+      print("isPickup: $isPickup");
+      print("delievryAddressOutOfRange: $delievryAddressOutOfRange");
       CoolAlert.show(
         context: viewContext,
         type: CoolAlertType.error,
         title: "Delivery address".tr(),
         text: "Delivery address is out of vendor delivery range".tr(),
       );
-      return; // Ensure it stops here
+      return; // Stop further execution if the delivery address is out of range
     }
     else if (selectedPaymentMethod?.name != "Wallet Balance"){
       if (( paymentCard == null ||

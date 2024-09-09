@@ -1,11 +1,13 @@
 import '../models/api_response.dart';
 import '../models/payment_card.dart';
 import '../models/user.dart';
+import '../services/auth.service.dart';
 import '../services/http.service.dart';
 
 class CardsRequest extends HttpService {
   //
   Future<void> saveCard({
+
     required String uuid,
     required String nonce,
     required User user,
@@ -16,6 +18,8 @@ class CardsRequest extends HttpService {
     required String postalCode,
     required String country,
   }) async {
+    final userToken = await AuthServices.getAuthBearerToken();
+
     /*"billing_address": {
           "address_line_1": "1777 Upland Dr.",
           "address_line_2": "",
@@ -59,7 +63,7 @@ class CardsRequest extends HttpService {
         headers: {
           'Square-Version': '2024-06-04',
           'Authorization':
-              'Bearer EAAAl_WIGd9u-3YE-HHtVvXRJGFeVC2JTqMv-BGiOdUTgbbfqb41ZcCo7JY2MQ-U',
+              'Bearer $userToken',
           'Content-Type': 'application/json'
         });
 
@@ -76,6 +80,9 @@ class CardsRequest extends HttpService {
   }
 
   Future<List<PaymentCard>> getCards(User user) async {
+    final userToken = await AuthServices.getAuthBearerToken();
+    print("User Token =====> $userToken");
+
     Map<String, dynamic> queryParameters = {
       "customer_id": user.squareCustomerId,
     };
@@ -94,7 +101,7 @@ class CardsRequest extends HttpService {
         headers: {
           'Square-Version': '2024-06-04',
           'Authorization':
-              'Bearer EAAAl_WIGd9u-3YE-HHtVvXRJGFeVC2JTqMv-BGiOdUTgbbfqb41ZcCo7JY2MQ-U',
+              'Bearer $userToken',
           'Content-Type': 'application/json'
         });
 
@@ -108,18 +115,20 @@ class CardsRequest extends HttpService {
         try {
           orders.add(PaymentCard.fromJson(jsonObject));
         } catch (e) {
-          print(e);
+          print("Error getting cards ====> $e");
         }
       }
 
       return orders;
     } else {
+      print("Api Response Message ====> ${apiResponse.message}");
       return [];
       //throw apiResponse.message!;
     }
   }
 
   Future<bool?> disableCard(String cardId) async {
+    final userToken = await AuthServices.getAuthBearerToken();
     final apiResult = await post("/v2/cards/$cardId/disable",
         /*baseUrl: "https://connect.squareupsandbox.com",
         headers: {
@@ -132,7 +141,7 @@ class CardsRequest extends HttpService {
         headers: {
           'Square-Version': '2024-06-04',
           'Authorization':
-              'Bearer EAAAl_WIGd9u-3YE-HHtVvXRJGFeVC2JTqMv-BGiOdUTgbbfqb41ZcCo7JY2MQ-U',
+              'Bearer $userToken',
           'Content-Type': 'application/json'
         });
 

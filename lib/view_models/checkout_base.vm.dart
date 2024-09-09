@@ -1187,7 +1187,8 @@ class CheckoutBaseViewModel extends PaymentViewModel {
   processOrderPlacement() async {
     //process the order placement
     setBusy(true);
-    //set the total with discount as the new total
+
+    // Show loading dialog
     CoolAlert.show(
       context: viewContext,
       type: CoolAlertType.loading,
@@ -1197,7 +1198,7 @@ class CheckoutBaseViewModel extends PaymentViewModel {
     );
 
     checkout!.total = checkout!.totalWithTip;
-    //
+
     print('processOrderPlacement');
     final apiResponse = await checkoutRequest.newOrder(
       checkout!,
@@ -1207,61 +1208,56 @@ class CheckoutBaseViewModel extends PaymentViewModel {
       fees: calFees,
     );
 
+    // Close the loading dialog before proceeding
+    Navigator.of(viewContext).pop();
+
+    // If there's an order ID and a payment card or default card, proceed with payment
     String? orderId = apiResponse.body["code"];
     if (null != orderId && (null != paymentCard || null != defaultCard.value)) {
       print("New Order Id => $orderId");
       print("Making card Payment");
+
       final apiResponse = await checkoutRequest.makeOrderPayment(
-          orderId: orderId,
-          paymentSourceId: (paymentCard ?? defaultCard.value!).id);
+        orderId: orderId,
+        paymentSourceId: (paymentCard ?? defaultCard.value!).id,
+      );
       print(apiResponse.body);
     } else {
       print("Order Id is empty");
     }
 
-    //notify wallet view to update, just incase wallet was use for payment
+    // Notify wallet view to update, just in case the wallet was used for payment
     AppService().refreshWalletBalance.add(true);
 
-    //not error
+    // If the order placement was successful
     if (apiResponse.allGood) {
-      //cash payment
-
       final paymentLink = apiResponse.body["link"].toString();
+
       if (!paymentLink.isEmptyOrNull) {
-        Navigator.of(viewContext).pop();
         showOrdersTab(context: viewContext);
         dynamic result;
-        // if (["offline", "razorpay"]
+
         if (["offline"].contains(checkout!.paymentMethod?.slug ?? "offline")) {
           result = await openExternalWebpageLink(paymentLink);
         } else {
           result = await openWebpageLink(paymentLink);
         }
         print("Result from payment ==> $result");
-      }
-      //cash payment
-      else {
+      } else {
         CoolAlert.show(
-            context: viewContext,
-            type: CoolAlertType.success,
-            title: "Checkout".tr(),
-            text: apiResponse.message,
-            confirmBtnText: "Ok".tr(),
-            barrierDismissible: false,
-            onConfirmBtnTap: () {
-              //Restarting the app
-
-              //Navigator.of(viewContext).pop(true);
-              showOrdersTab(context: viewContext);
-
-              /*if (Navigator.of(viewContext).canPop()) {
-                Navigator.of(viewContext).popUntil(
-                  (route) => route == AppRoutes.homeRoute || route.isFirst,
-                );
-              }*/
-            });
+          context: viewContext,
+          type: CoolAlertType.success,
+          title: "Checkout".tr(),
+          text: apiResponse.message,
+          confirmBtnText: "Ok".tr(),
+          barrierDismissible: false,
+          onConfirmBtnTap: () {
+            showOrdersTab(context: viewContext);
+          },
+        );
       }
     } else {
+      // Show error alert if something goes wrong
       CoolAlert.show(
         context: viewContext,
         type: CoolAlertType.error,
@@ -1269,8 +1265,10 @@ class CheckoutBaseViewModel extends PaymentViewModel {
         text: apiResponse.message,
       );
     }
+
     setBusy(false);
   }
+
 
   //
   showOrdersTab({

@@ -39,25 +39,28 @@ class PaymentCard {
     required this.version,
   });
 
-  factory PaymentCard.fromJson(Map<String, dynamic> json) => PaymentCard(
-        id: json["id"],
-        cardBrand: json["card_brand"] ?? "",
-        last4: json["last_4"] ?? "",
-        expMonth: json["exp_month"] ?? 0,
-        expYear: json["exp_year"] ?? 0,
-        cardholderName: json["cardholder_name"] ?? "",
-        billingAddress: json["billing_address"] == null
-            ? null
-            : BillingAddress.fromJson(json["billing_address"]),
-        fingerprint: json["fingerprint"] ?? "",
-        customerId: json["customer_id"] ?? "",
-        merchantId: json["merchant_id"] ?? "",
-        referenceId: json["reference_id"] ?? "",
-        enabled: json["enabled"] ?? false,
-        cardType: json["card_type"] ?? "",
-        prepaidType: json["prepaid_type"] ?? "",
-        bin: json["bin"] ?? "",
-        createdAt: json["created_at"] ?? "",
-        version: json["version"] ?? 0,
-      );
+  factory PaymentCard.fromJson(Map<String, dynamic> json) {
+    print("Payment Cards ====> ${json.toString()}");
+    return PaymentCard(
+      id: json["id"],
+      cardBrand: json["card_brand"] ?? "",
+      last4: json["last_4"] ?? "",
+      expMonth: json["exp_month"] ?? 0,
+      expYear: json["exp_year"] ?? 0,
+      cardholderName: json["cardholder_name"] ?? "",
+      billingAddress: json["billing_address"] == null
+          ? null
+          : BillingAddress.fromJson(json["billing_address"]),
+      fingerprint: json["fingerprint"] ?? "",
+      customerId: json["customer_id"] ?? "",
+      merchantId: json["merchant_id"] ?? "",
+      referenceId: json["reference_id"] ?? "",
+      enabled: json["enabled"] ?? false,
+      cardType: json["card_type"] ?? "",
+      prepaidType: json["prepaid_type"] ?? "",
+      bin: json["bin"] ?? "",
+      createdAt: json["created_at"] ?? "",
+      version: json["version"] ?? 0,
+    );
+  }
 }

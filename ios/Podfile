@@ -32,6 +32,8 @@ target 'Runner' do
   pod "SquareInAppPaymentsSDK"
   pod "SquareBuyerVerificationSDK"
   use_modular_headers!
+  pod "GoogleMaps"
+  pod "GooglePlaces"
 
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
   target 'RunnerTests' do

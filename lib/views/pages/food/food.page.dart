@@ -1,12 +1,10 @@
 import 'dart:math';
-
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:pull_to_refresh_flutter3/pull_to_refresh_flutter3.dart';
 import 'package:stacked/stacked.dart';
 import 'package:velocity_x/velocity_x.dart';
-
 import '../../../constants/app_colors.dart';
 import '../../../constants/app_images.dart';
 import '../../../constants/app_routes.dart';
@@ -15,6 +13,7 @@ import '../../../enums/product_fetch_data_type.enum.dart';
 import '../../../models/category.dart';
 import '../../../models/search.dart';
 import '../../../models/vendor_type.dart';
+import '../../../services/location.service.dart';
 import '../../../utils/ui_spacer.dart';
 import '../../../view_models/vendor.vm.dart';
 import '../../../widgets/base.page.dart';
@@ -44,6 +43,18 @@ class _FoodPageState extends State<FoodPage>
   bool filterDone = true;
   bool isSelected = true;
   ScrollController scrollController = ScrollController();
+  // Future<void> locationListener() async {
+  //   await LocationService.prepareLocationListener();
+  // }
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   WidgetsBinding.instance.addPostFrameCallback(
+  //         (_) {
+  //       locationListener();
+  //     },
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -136,13 +147,15 @@ class _FoodPageState extends State<FoodPage>
                       ).toList(),
                     ).box.clip(Clip.antiAlias).make() : SizedBox(),
 
-                    isSelected == true ?    SectionVendorsView(
+                    isSelected == true ?
+
+                    SectionVendorsView(
                       widget.vendorType,
                       title: "Featured Stores".tr(),
                       scrollDirection: Axis.horizontal,
                       type: SearchFilterType.featured,
                       itemWidth: context.percentWidth * 55,
-                      // byLocation: AppStrings.enableFatchByLocation,
+                      byLocation: AppStrings.enableFatchByLocation,
                     ) : SizedBox(),
 
                     isSelected == true ? FlashSaleView(widget.vendorType) : SizedBox(),
@@ -170,6 +183,7 @@ class _FoodPageState extends State<FoodPage>
                           viewType: HorizontalVendorListItem,
                           separator: UiSpacer.verticalSpace(space: 0),
                           category: category,
+                          byLocation: AppStrings.enableFatchByLocation,
                         ),
                       ),
                     //all products

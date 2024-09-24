@@ -11,6 +11,7 @@ import '../../models/delivery_address.dart';
 import '../../models/search.dart';
 import '../../models/vendor_type.dart';
 import '../../requests/delivery_address.request.dart';
+import '../../services/location.service.dart';
 import '../vendor_distance.vm.dart';
 
 class SectionVendorsViewModel extends MyBaseViewModel {
@@ -35,10 +36,13 @@ class SectionVendorsViewModel extends MyBaseViewModel {
   DeliveryAddress? deliveryAddress;
   Vendor? vendor; // Ensure vendor is initialized here
   DeliveryAddressRequest deliveryAddressRequest = DeliveryAddressRequest();
-
+  Future<void> locationListener() async {
+    await LocationService.prepareLocationListener();
+  }
   initialise() {
     isPickup = VendorDistanceViewModel().isPickup.value;
     VendorDistanceViewModel().isPickup.addListener(_onPickupChanged);
+    locationListener();
     fetchVendors();
   }
 
@@ -141,6 +145,7 @@ class SectionVendorsViewModel extends MyBaseViewModel {
           "vendor_type_id": vendorType?.id,
           "category_id": category?.id,
           "type": type.name,
+
         },
       );
 
@@ -165,4 +170,5 @@ class SectionVendorsViewModel extends MyBaseViewModel {
     }
     notifyListeners();
   }
+
 }

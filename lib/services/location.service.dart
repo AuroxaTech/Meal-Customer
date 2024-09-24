@@ -25,14 +25,14 @@ class LocationService {
 
   //
   static BehaviorSubject<Address> currenctAddressSubject =
-      BehaviorSubject<Address>();
+  BehaviorSubject<Address>();
   // static Stream<Address> get currenctAddressStream =>
   //     _currenctAddressSubject.stream;
 
   static Future<void> prepareLocationListener() async {
     _permissionGranted = await location.hasPermission();
+
     if (_permissionGranted == PermissionStatus.denied) {
-      //
       bool requestPermission = true;
       if (!Platform.isIOS) {
         requestPermission = await showRequestDialog();
@@ -40,20 +40,23 @@ class LocationService {
       if (requestPermission) {
         _permissionGranted = await location.requestPermission();
         if (_permissionGranted != PermissionStatus.granted) {
+          print("Location permission denied.");
           return;
         }
       }
     }
 
     serviceEnabled = await location.serviceEnabled();
-    if (serviceEnabled == null || serviceEnabled! == false) {
+    if (serviceEnabled == null || serviceEnabled == false) {
       serviceEnabled = await location.requestService();
-      if (serviceEnabled == null || serviceEnabled! == false) {
+      if (serviceEnabled == null || serviceEnabled == false) {
+        print("Location services not enabled.");
         return;
       }
     }
 
-    _startLocationListner();
+    print("Starting location listener.");
+    startLocationListner();
   }
 
   static Future<bool> showRequestDialog() async {
@@ -74,36 +77,32 @@ class LocationService {
     return requestResult;
   }
 
-  static void _startLocationListner() async {
-    //
-    //update location every 100meters
-    // await location.changeSettings(distanceFilter: 50);
-    // //listen
-    // currentLocationListener =
-    //     location.onLocationChanged.listen((LocationData currentLocation) {
-    //   // Use current location
-    //   _locationData = currentLocation;
-    //   //
-    //   geocodeCurrentLocation(true);
-    // });
+  static Future<void> startLocationListner() async {
+    print("Listening for location changes...");
 
-    //listen
-    currentLocationListener =
-        Geolocator.getPositionStream().listen((Position currentLocation) {
+    // Throttle the location stream to only respond every 5 seconds
+    currentLocationListener = Geolocator.getPositionStream()
+        .debounceTime(Duration(seconds: 5)) // Debounce to control frequency
+        .listen((Position currentLocation) {
       // Use current location
       _locationData = LocationData.fromMap(currentLocation.toJson());
-      //
+      print("Current location data: ${_locationData?.latitude}, ${_locationData?.longitude}");
+
+      // Fetch the geocoded address based on current coordinates
       geocodeCurrentLocation(true);
     });
 
-    //get the current location on send to listeners
+    // Get the initial location
     _locationData = await location.getLocation();
-    geocodeCurrentLocation();
+    if (_locationData != null) {
+      print("Initial location: ${_locationData?.latitude}, ${_locationData?.longitude}");
+      geocodeCurrentLocation();
+    } else {
+      print("Initial location not available.");
+    }
   }
-
   //
-  static Future<void> geocodeCurrentLocation(
-      [bool closeListener = false]) async {
+  static Future<void> geocodeCurrentLocation([bool closeListener = false]) async {
     if (_locationData != null) {
       final coordinates = new Coordinates(
         _locationData?.latitude ?? 0.0,
@@ -111,24 +110,24 @@ class LocationService {
       );
 
       try {
-        //
-        final addresses = await GeocoderService().findAddressesFromCoordinates(
-          coordinates,
-        );
-        //
-        currenctAddress = addresses.first;
-        //
-        if (currenctAddress != null) {
+        final addresses = await GeocoderService().findAddressesFromCoordinates(coordinates);
+
+        if (addresses.isNotEmpty) {
+          currenctAddress = addresses.first;
+          print("Geocoded address: ${currenctAddress?.addressLine}");
           currenctAddressSubject.add(currenctAddress!);
+        } else {
+          print("No addresses found for the current coordinates.");
         }
       } catch (error) {
-        print("Error get location ==> $error");
+        print("Error during geocoding: $error");
       }
+    } else {
+      print("Location data is null, cannot geocode.");
     }
 
-    //
     if (closeListener) {
-      print("Location listener closed");
+      print("Location listener closed.");
       currentLocationListener?.cancel();
     }
   }
@@ -161,6 +160,7 @@ class LocationService {
 
   //get current lat
   static double? get cLat {
+    print("LocationService Latitude===> ${LocationService.currenctAddress?.coordinates?.latitude}");
     return LocationService.currenctAddress?.coordinates?.latitude;
   }
 

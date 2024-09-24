@@ -34,6 +34,9 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   late HomeViewModel vm;
   VendorDistanceViewModel vendorDistanceViewModel = VendorDistanceViewModel();
+  Future<void> locationListener() async {
+    await LocationService.prepareLocationListener();
+  }
 
   @override
   void initState() {
@@ -41,7 +44,7 @@ class _HomePageState extends State<HomePage> {
     vm = HomeViewModel(context);
     WidgetsBinding.instance.addPostFrameCallback(
       (_) {
-        LocationService.prepareLocationListener();
+        locationListener();
         vm.initialise();
       },
     );
@@ -296,7 +299,7 @@ class _HomePageState extends State<HomePage> {
                       20.heightBox,
                     const Banners(vendorType: null),
                     SectionVendorsView(
-                      null,
+                      vm.vendorType,
                       title: "Featured Stores",
                       scrollDirection: Axis.horizontal,
                       type: SearchFilterType.sales,

@@ -19,6 +19,8 @@ class HorizontalVendorListItem extends StatelessWidget {
     super.key,
   });
 
+
+
   final Vendor vendor;
   final Function(Vendor) onPressed;
   final Function(bool isFavorite) onFavoriteChange;

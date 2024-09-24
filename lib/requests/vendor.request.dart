@@ -16,6 +16,9 @@ class VendorRequest extends HttpService {
     bool byLocation = true,
     Map? params,
   }) async {
+    // Ensure location is ready
+    await ensureLocationIsReady();
+
     Map<String, dynamic> queryParameters = {
       ...(params ?? {}),
       "page": "$page",
@@ -23,12 +26,16 @@ class VendorRequest extends HttpService {
 
     final isAuth = AuthServices.authenticated();
 
-    if (byLocation && LocationService.cLat != null) {
+    // Check if location data is available before adding it to the query parameters
+    if (byLocation && LocationService.cLat != null && LocationService.cLng != null) {
       queryParameters["latitude"] =
           LocationService.currenctAddress?.coordinates?.latitude;
       queryParameters["longitude"] =
           LocationService.currenctAddress?.coordinates?.longitude;
     }
+
+    print("Latitude send to api===> ${LocationService.currenctAddress?.coordinates?.latitude}");
+    print("Longitude send to api ===> ${LocationService.currenctAddress?.coordinates?.longitude}");
 
     final apiResult = await get(
       isAuth ? Api.user_vendors : Api.vendors,
@@ -53,6 +60,19 @@ class VendorRequest extends HttpService {
     }
 
     throw apiResponse.message!;
+  }
+
+// Ensure location is ready before proceeding
+  Future<void> ensureLocationIsReady() async {
+    if (LocationService.currenctAddress == null) {
+      print("Waiting for location...");
+      await LocationService.prepareLocationListener();
+
+      // Wait until the location is ready
+      while (LocationService.currenctAddress == null) {
+        await Future.delayed(Duration(milliseconds: 100));
+      }
+    }
   }
 
   //

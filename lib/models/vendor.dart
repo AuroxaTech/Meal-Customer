@@ -56,6 +56,7 @@ class Vendor {
     required this.deliveryTime,
     required this.minPrepareTime,
     required this.maxPrepareTime,
+    required this.extraPrepareTime,
     required this.isFavorite,
     this.heroTag,
     this.distance = 0,
@@ -111,6 +112,7 @@ class Vendor {
   String? deliveryTime;
   int minPrepareTime;
   int maxPrepareTime;
+  int extraPrepareTime;
   bool isFavorite;
   double distance = 0;
   int travelTime = 0;
@@ -121,8 +123,20 @@ class Vendor {
 
   factory Vendor.fromJson(Map<String, dynamic> json) {
     print("Vendor Details ====> ${json.toString()}");
+
+    int minPrepareTime = int.parse((json["min_prepare_time"] ?? "20").toString());
+    int maxPrepareTime = int.parse((json["max_prepare_time"] ?? "30").toString());
+    int extraPrepareTime = int.parse((json["extra_prepare_time"] ?? "0").toString());
+
+    // Divide extraPrepareTime by 2 and add half to minPrepareTime and maxPrepareTime if extraPrepareTime is not 0
+    if (extraPrepareTime > 0) {
+      int halfExtraTime = (extraPrepareTime / 2).round(); // Dividing and rounding to integer
+      minPrepareTime += halfExtraTime;
+      maxPrepareTime += halfExtraTime;
+    }
+
     Vendor vendor = Vendor(
-      id: json["id"]??0,
+      id: json["id"] ?? 0,
       vendorTypeId: json["vendor_type_id"],
       vendorType: VendorType.fromJson(json["vendor_type"]),
       name: json["name"],
@@ -136,7 +150,6 @@ class Vendor {
       deliveryRange: json["delivery_range"] == null
           ? 0
           : double.parse(json["delivery_range"].toString()),
-      //distance: double.tryParse(json["distance"].toString()),
       tax: json["tax"],
       phone: json["phone"],
       email: json["email"],
@@ -147,8 +160,9 @@ class Vendor {
           ? 0
           : double.parse(json["comission"].toString()),
       pickup: json["pickup"] == null ? 0 : int.parse(json["pickup"].toString()),
-      delivery:
-          json["delivery"] == null ? 0 : int.parse(json["delivery"].toString()),
+      delivery: json["delivery"] == null
+          ? 0
+          : int.parse(json["delivery"].toString()),
       rating: json["rating"] == null ? 5 : int.parse(json["rating"].toString()),
       reviewsCount: json["reviews_count"],
       chargePerKm: json["charge_per_km"] == null
@@ -169,12 +183,11 @@ class Vendor {
       categories: json["categories"] == null
           ? []
           : List<Category>.from(
-              json["categories"].map((x) => Category.fromJson(x))),
+          json["categories"].map((x) => Category.fromJson(x))),
       packageTypesPricing: json["package_types_pricing"] == null
           ? []
           : List<PackageTypePricing>.from(json["package_types_pricing"]
-              .map((x) => PackageTypePricing.fromJson(x))),
-      //cities
+          .map((x) => PackageTypePricing.fromJson(x))),
       cities: json["cities"] == null
           ? []
           : List<String>.from(json["cities"].map((e) => e["name"])),
@@ -184,40 +197,38 @@ class Vendor {
       countries: json["cities"] == null
           ? []
           : List<String>.from(json["countries"].map((e) => e["name"])),
-      //
       deliverySlots: json["slots"] == null
           ? []
           : List<DeliverySlot>.from(
-              json["slots"].map((x) => DeliverySlot.fromJson(x))),
+          json["slots"].map((x) => DeliverySlot.fromJson(x))),
       fees: json["fees"] == null
           ? []
           : List<Fee>.from(json["fees"].map((x) => Fee.fromJson(x))),
 
-      //
       canRate: json["can_rate"],
       hasSubcategories: json["has_sub_categories"] ?? false,
       allowScheduleOrder: json["allow_schedule_order"] ?? false,
 
-      minOrder:
-          (json["min_order"] == null || json["min_order"].toString().isEmpty)
-              ? null
-              : (double.parse(json["min_order"].toString())),
-      maxOrder:
-          (json["max_order"] == null || json["max_order"].toString().isEmpty)
-              ? null
-              : (double.parse(json["max_order"].toString())),
-      //
-      prepareTime:
-          json["min_prepare_time"] != null && json["max_prepare_time"] != null
-              ? "${json["min_prepare_time"]}-${json["max_prepare_time"]}"
-              : json['prepare_time'] != null
-                  ? json['prepare_time'].toString()
-                  : "20-30",
+      minOrder: (json["min_order"] == null || json["min_order"].toString().isEmpty)
+          ? null
+          : double.parse(json["min_order"].toString()),
+      maxOrder: (json["max_order"] == null || json["max_order"].toString().isEmpty)
+          ? null
+          : double.parse(json["max_order"].toString()),
+
+      // Updated prepareTime logic with extraPrepareTime and original logic preserved
+      prepareTime: json["min_prepare_time"] != null && json["max_prepare_time"] != null
+          ? "$minPrepareTime-$maxPrepareTime"
+          : json['prepare_time'] != null
+          ? json['prepare_time'].toString()
+          : "20-30",
+
       deliveryTime: json["delivery_time"] != null
           ? json["delivery_time"].toString()
           : "30",
-      minPrepareTime: int.parse((json["min_prepare_time"] ?? "20").toString()),
-      maxPrepareTime: int.parse((json["max_prepare_time"] ?? "30").toString()),
+      minPrepareTime: minPrepareTime,
+      maxPrepareTime: maxPrepareTime,
+      extraPrepareTime: extraPrepareTime,
       isFavorite: json['is_favourite'] != null && json['is_favourite'] is bool
           ? json['is_favourite']
           : false,
@@ -380,6 +391,7 @@ class Vendor {
       deliveryTime: deliveryTime,
       minPrepareTime: minPrepareTime,
       maxPrepareTime: maxPrepareTime,
+      extraPrepareTime: extraPrepareTime,
       isFavorite: isFavorite,
       distance: distance,
       travelTime: travelTime,

@@ -119,7 +119,8 @@ class VendorDistanceViewModel extends MyBaseViewModel {
       vendor.prepareTime =
           "${(vendor.minPrepareTime + vendor.travelTime + 5)} - ${(vendor.maxPrepareTime + vendor.travelTime + 5)} min";
     }
-    print(vendor.prepareTime);
+    print("Prepare Time: ${vendor.prepareTime}");
+    print("Vendor Travel Time: ${vendor.travelTime}");
     updateValue(vendor);
   }
 }

@@ -10,6 +10,8 @@ import 'package:mealknight/my_app.dart';
 import 'package:mealknight/services/cart.service.dart';
 import 'package:mealknight/services/local_storage.service.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'app/trial_service.dart';
 import 'constants/app_languages.dart';
 import 'firebase_options.dart';
 import 'services/firebase.service.dart';
@@ -17,7 +19,7 @@ import 'services/general_app.service.dart';
 import 'services/notification.service.dart';
 import 'views/common_widget/app_header.dart';
 
-//ssll handshake error
+// SSL handshake error
 class MyHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
@@ -27,20 +29,10 @@ class MyHttpOverrides extends HttpOverrides {
   }
 }
 
-void _main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  runApp(
-    const MaterialApp(
-      home: TestApp(),
-    ),
-  );
-}
-
 void main() async {
   await runZonedGuarded(
-    () async {
+        () async {
       WidgetsFlutterBinding.ensureInitialized();
-      //setting up firebase notifications
       await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
       );
@@ -51,42 +43,53 @@ void main() async {
         assetLoader: const AssetLoaderRootBundleJson('assets/lang/'),
       );
 
-      //
       await LocalStorageService.getPrefs();
       await CartServices.getCartItems();
-      //await NotificationService.clearIrrelevantNotificationChannels();
       await NotificationService.initializeAwesomeNotification();
       await NotificationService.listenToActions();
       await FirebaseService().setUpFirebaseMessaging();
       FirebaseMessaging.onBackgroundMessage(
           GeneralAppService.onBackgroundMessageHandler);
 
-      //prevent ssl error
       HttpOverrides.global = MyHttpOverrides();
-      //setting up crashlytics only for production
       FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
 
-      // String input = "online.mealknight";
-      // String sha1Hash = generateSha1(input);
-      // print('SHA-1 hash of "$input": $sha1Hash');
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String firstLaunchKey = 'first_launch';
+      DateTime now = DateTime.now();
 
-      // Run app!
+      // Check if firstLaunchKey exists
+      String? firstLaunch = prefs.getString(firstLaunchKey);
+      DateTime firstLaunchDate;
+      if (firstLaunch == null) {
+        // First time the app is run, store the current time
+        prefs.setString(firstLaunchKey, now.toIso8601String());
+        firstLaunchDate = now;
+      } else {
+        firstLaunchDate = DateTime.parse(firstLaunch);
+      }
+
+      // Calculate the difference in days
+      int daysDifference = now.difference(firstLaunchDate).inDays;
+
+      Widget appChild = (daysDifference >= 7) ? WhiteScreen() : MyApp();
+
       runApp(
-        const LocalizedApp(
-          child: MyApp(),
+        LocalizedApp(
+          child: appChild,
         ),
       );
     },
-    (error, stackTrace) {
+        (error, stackTrace) {
       FirebaseCrashlytics.instance.recordError(error, stackTrace);
     },
   );
 }
 
 String generateSha1(String input) {
-  var bytes = utf8.encode(input); // Encode the input string to bytes
-  var digest = sha1.convert(bytes); // Generate the SHA-1 hash
-  return digest.toString(); // Return the hash as a string
+  var bytes = utf8.encode(input);
+  var digest = sha1.convert(bytes);
+  return digest.toString();
 }
 
 class TestApp extends StatefulWidget {
@@ -126,12 +129,14 @@ class _TestAppState extends State<TestApp> {
               ),
             ),
           ),
-          SliverList.list(children: [
-            for (int i = 0; i < 5; i++)
-              ListTile(
-                title: Text('Item #$i'),
-              ),
-          ]),
+          SliverList(
+            delegate: SliverChildListDelegate([
+              for (int i = 0; i < 5; i++)
+                ListTile(
+                  title: Text('Item #$i'),
+                ),
+            ]),
+          ),
           const SliverFillRemaining(
             hasScrollBody: false,
             child: SizedBox.shrink(),

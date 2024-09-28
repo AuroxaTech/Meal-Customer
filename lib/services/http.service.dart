@@ -109,7 +109,7 @@ class HttpService {
     Response response;
 
     print("${Api.baseUrl}$url");
-    print(await getHeaders());
+    print("Headers: ${await getHeaders()}");
     try {
       response = await dio!.get(
         uri,

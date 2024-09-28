@@ -72,7 +72,7 @@ void main() async {
       // Calculate the difference in days
       int daysDifference = now.difference(firstLaunchDate).inDays;
 
-      Widget appChild = (daysDifference >= 7) ? WhiteScreen() : MyApp();
+      Widget appChild = (daysDifference >= 7) ? WhiteScreen() : const MyApp();
 
       runApp(
         LocalizedApp(

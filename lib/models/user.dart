@@ -29,6 +29,7 @@ class User {
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
+    print("User Details ===> ${json.toString()}");
     return User(
       id: json['id'],
       code: json['code'],

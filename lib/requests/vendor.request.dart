@@ -17,7 +17,7 @@ class VendorRequest extends HttpService {
     Map? params,
   }) async {
     // Ensure location is ready
-    await ensureLocationIsReady();
+    //await ensureLocationIsReady();
 
     Map<String, dynamic> queryParameters = {
       ...(params ?? {}),

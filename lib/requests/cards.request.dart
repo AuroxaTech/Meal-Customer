@@ -1,3 +1,5 @@
+import 'package:dio/dio.dart';
+
 import '../models/api_response.dart';
 import '../models/payment_card.dart';
 import '../models/user.dart';
@@ -86,9 +88,9 @@ class CardsRequest extends HttpService {
     Map<String, dynamic> queryParameters = {
       "customer_id": user.squareCustomerId,
     };
-    print("customer id =====> ${user.squareCustomerId}");
+    print("Card id =====> ${user.squareupDefaultCardId}");
 
-    final apiResult = await get("/v2/cards",
+    final apiResult = await get('/v2/cards',
         queryParameters: queryParameters,
         /*baseUrl: "https://connect.squareupsandbox.com",
         headers: {
@@ -96,14 +98,15 @@ class CardsRequest extends HttpService {
           'Authorization': 'Bearer EAAAlx7cpK3mNRBAr4A5rlY35mh4QXa41qUODPhhjU00Eyicl0GK30FSM5FQn8gz',
           'Content-Type': 'application/json'
         });*/
+        baseUrl: 'https://connect.squareup.com',
 
-        baseUrl: "https://connect.squareup.com",
-        headers: {
-          'Square-Version': '2024-06-04',
-          'Authorization':
-              'Bearer $userToken',
-          'Content-Type': 'application/json'
-        });
+          headers: {
+            'Square-Version': '2024-03-20',
+            'Authorization':
+            'Bearer EAAAl_WIGd9u-3YE-HHtVvXRJGFeVC2JTqMv-BGiOdUTgbbfqb41ZcCo7JY2MQ-U',
+            'Content-Type': 'application/json',
+          },
+        );
 
     final apiResponse = ApiResponse.fromResponse(apiResult);
     print("Cards Detail =======> ${apiResponse.body}");
@@ -116,6 +119,7 @@ class CardsRequest extends HttpService {
           orders.add(PaymentCard.fromJson(jsonObject));
         } catch (e) {
           print("Error getting cards ====> $e");
+          rethrow;
         }
       }
 
@@ -140,8 +144,7 @@ class CardsRequest extends HttpService {
         baseUrl: "https://connect.squareup.com",
         headers: {
           'Square-Version': '2024-06-04',
-          'Authorization':
-              'Bearer $userToken',
+          'Authorization': 'Bearer $userToken',
           'Content-Type': 'application/json'
         });
 

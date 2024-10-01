@@ -5,7 +5,6 @@ import 'package:mealknight/constants/app_routes.dart';
 import 'package:mealknight/models/vendor.dart';
 import 'package:mealknight/requests/vendor.request.dart';
 import 'package:mealknight/view_models/base.view_model.dart';
-
 import '../../models/category.dart';
 import '../../models/delivery_address.dart';
 import '../../models/search.dart';

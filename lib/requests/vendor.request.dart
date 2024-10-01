@@ -6,18 +6,17 @@ import 'package:mealknight/models/vendor.dart';
 import 'package:mealknight/services/auth.service.dart';
 import 'package:mealknight/services/http.service.dart';
 import 'package:mealknight/services/location.service.dart';
-
 import '../view_models/vendor_distance.vm.dart';
 
 class VendorRequest extends HttpService {
-  //
+
   Future<List<Vendor>> vendorsRequest({
     int page = 1,
     bool byLocation = true,
     Map? params,
   }) async {
     // Ensure location is ready
-    //await ensureLocationIsReady();
+    await ensureLocationIsReady();
 
     Map<String, dynamic> queryParameters = {
       ...(params ?? {}),
@@ -25,7 +24,6 @@ class VendorRequest extends HttpService {
     };
 
     final isAuth = AuthServices.authenticated();
-
     // Check if location data is available before adding it to the query parameters
     if (byLocation && LocationService.cLat != null && LocationService.cLng != null) {
       queryParameters["latitude"] =
@@ -58,24 +56,21 @@ class VendorRequest extends HttpService {
       VendorDistanceViewModel().addAllVendors(vendors);
       return vendors;
     }
-
     throw apiResponse.message!;
   }
 
-// Ensure location is ready before proceeding
+//Ensure location is ready before proceeding
   Future<void> ensureLocationIsReady() async {
     if (LocationService.currenctAddress == null) {
       print("Waiting for location...");
       await LocationService.prepareLocationListener();
-
-      // Wait until the location is ready
+      //Wait until the location is ready
       while (LocationService.currenctAddress == null) {
         await Future.delayed(Duration(milliseconds: 100));
       }
     }
   }
 
-  //
   Future<List<Vendor>> topVendorsRequest({
     int page = 1,
     bool byLocation = false,
@@ -105,7 +100,6 @@ class VendorRequest extends HttpService {
       VendorDistanceViewModel().addAllVendors(vendors);
       return vendors;
     }
-
     throw apiResponse.message!;
   }
 
@@ -138,7 +132,6 @@ class VendorRequest extends HttpService {
       VendorDistanceViewModel().addAllVendors(vendors);
       return vendors;
     }
-
     throw apiResponse.message!;
   }
 
@@ -157,7 +150,6 @@ class VendorRequest extends HttpService {
       VendorDistanceViewModel().addAllVendors([vendor]);
       return vendor;
     }
-
     throw apiResponse.message!;
   }
 
@@ -193,11 +185,9 @@ class VendorRequest extends HttpService {
       VendorDistanceViewModel().addAllVendors(vendors);
       return vendors;
     }
-
     throw apiResponse.message!;
   }
 
-  //
   Future<ApiResponse> rateVendor({
     required int rating,
     required String review,
@@ -255,10 +245,8 @@ class VendorRequest extends HttpService {
           return Review.fromJson(jsonObject);
         },
       ).toList();
-
       return reviews;
     }
-
     throw apiResponse.message!;
   }
 }

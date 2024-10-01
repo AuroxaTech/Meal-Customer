@@ -1296,7 +1296,7 @@ class CheckoutBaseViewModel extends PaymentViewModel {
     //if order is less than the min allowed order by this vendor
     //if vendor is currently open for accepting orders
 
-    if (!vendor!.isOpen && !(checkout!.isScheduled ?? false) && !isPickup) {
+    if (vendor == null || !vendor!.isOpen && !(checkout!.isScheduled ?? false) && !isPickup) {
       //vendor is closed
       CoolAlert.show(
         context: viewContext,
